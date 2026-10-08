@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="kk" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Қазақстан Географиясы & Тектоникасы - Интерактивті Квиз</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              400: '#38bdf8',
+              500: '#06b6d4',
+              600: '#0284c7',
+              700: '#0369a1',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom scrollbars & glassmorphism effects */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.6); }
+    
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .glass-pill {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="h-full font-sans antialiased bg-slate-950 text-slate-100 flex flex-col min-h-screen selection:bg-sky-500 selection:text-white">
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- App Brand -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+          <i data-lucide="compass" class="w-6 h-6 text-white animate-spin-slow"></i>
+        </div>
+        <div>
+          <h1 class="font-display font-bold text-lg tracking-tight gradient-text">GeoQuiz KZ</h1>
+          <p class="text-xs text-slate-400 font-medium">Геология & Тектоника</p>
+        </div>
+      </div>
+
+      <!-- View Switcher Tabs -->
+      <div class="flex items-center space-x-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800">
+        <button id="navStudentBtn" onclick="switchTab('student')" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-sky-500 text-white shadow-md shadow-sky-500/25">
+          <i data-lucide="user" class="w-4 h-4"></i>
+          <span>Студент</span>
+        </button>
+        <button id="navAdminBtn" onclick="openAdminAuthModal()" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all duration-200">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+          <span>Администратор</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+
+    <!-- ================= STUDENT VIEW ================= -->
+    <section id="studentView" class="w-full max-w-3xl mx-auto space-y-6">
+      
+      <!-- STEP 1: Registration Form Screen -->
+      <div id="stepRegistration" class="glass-card rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-60 h-60 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="text-center max-w-md mx-auto space-y-4 mb-8">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
+            <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Қазақстан географиясы
+          </span>
+          <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Білгірлер бәйгесіне қош келдіңіз!
+          </h2>
+          <p class="text-sm text-slate-400">
+            Палеозой эрасы, платформалар мен тектоникалық қозғалыстар бойынша біліміңізді тексеріңіз.
+          </p>
+        </div>
+
+        <form id="regForm" onsubmit="handleStartQuiz(event)" class="space-y-5 max-w-md mx-auto">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+              Аты-жөніңіз (Толық) *
+            </label>
+            <div class="relative">
+              <i data-lucide="user-check" class="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"></i>
+              <input type="text" id="studentName" required placeholder="Мысалы: Арман Серіков"
+                     class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+              Топ / Сынып *
+            </label>
+            <div class="relative">
+              <i data-lucide="users" class="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"></i>
+              <input type="text" id="studentGroup" required placeholder="Мысалы: ГЕО-201 немесе 11-А"
+                     class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition">
+            </div>
+          </div>
+
+          <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-2">
+            <div class="flex items-center gap-2 text-slate-300 font-medium">
+              <i data-lucide="info" class="w-4 h-4 text-sky-400"></i> Квиз ережелері:
+            </div>
+            <ul class="list-disc list-inside space-y-1 pl-1">
+              <li>Барлығы 7 тест сұрағы.</li>
+              <li>Әр сұраққа 40 секунд уақыт беріледі.</li>
+              <li>Нәтижеңіз оқытушының онлайн панелінде бірден көрінеді.</li>
+            </ul>
+          </div>
+
+          <button type="submit" 
+                  class="w-full py-3.5 px-6 rounded-xl font-bold text-sm bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white shadow-lg shadow-sky-500/25 flex items-center justify-center space-x-2 transition transform active:scale-98">
+            <span>Тестті бастау</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+
+      <!-- STEP 2: Quiz Question Screen -->
+      <div id="stepQuiz" class="hidden space-y-5">
+        <!-- Progress Bar & Timer Header -->
+        <div class="glass-card rounded-xl p-4 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3 flex-1">
+            <span class="text-xs font-bold text-sky-400 bg-sky-500/10 border border-sky-500/20 px-3 py-1.5 rounded-lg whitespace-nowrap">
+              Сұрақ <span id="qIndex">1</span> / <span id="qTotal">7</span>
+            </span>
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+              <div id="quizProgressBar" class="bg-gradient-to-r from-sky-400 to-indigo-500 h-full w-0 transition-all duration-300"></div>
+            </div>
+          </div>
+          <div id="quizTimer" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold min-w-[70px] justify-center">
+            <i data-lucide="clock" class="w-4 h-4"></i>
+            <span id="timerText">40с</span>
+          </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="glass-card rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl border border-slate-800">
+          <h3 id="questionTitle" class="font-display text-xl sm:text-2xl font-bold text-white leading-snug">
+            <!-- Question text gets injected here -->
+          </h3>
+
+          <div id="optionsContainer" class="grid grid-cols-1 gap-3">
+            <!-- Options dynamically generated -->
+          </div>
+
+          <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+            <span id="quizStudentTag" class="text-xs text-slate-400 font-medium">--</span>
+            <button id="nextBtn" onclick="submitAnswer()" disabled
+                    class="px-6 py-2.5 rounded-xl font-bold text-sm bg-slate-800 text-slate-500 cursor-not-allowed flex items-center space-x-2 transition duration-200">
+              <span>Келесі сұрақ</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Quiz Result Screen -->
+      <div id="stepResult" class="hidden glass-card rounded-2xl p-6 sm:p-10 text-center space-y-8 shadow-2xl relative overflow-hidden">
+        <div class="space-y-3">
+          <div id="scoreBadge" class="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold shadow-lg">
+            <!-- Score percentage -->
+          </div>
+          <h2 class="font-display text-3xl font-bold text-white">Квиз аяқталды!</h2>
+          <p id="resultGreeting" class="text-slate-400 text-sm max-w-md mx-auto"></p>
+        </div>
+
+        <!-- Score metrics breakdown -->
+        <div class="grid grid-cols-3 gap-3 max-w-md mx-auto">
+          <div class="glass-pill p-3 rounded-xl border border-slate-800">
+            <div class="text-xs text-slate-400">Жиналған ұпай</div>
+            <div id="resScoreText" class="text-lg font-bold text-white mt-1">0 / 7</div>
+          </div>
+          <div class="glass-pill p-3 rounded-xl border border-slate-800">
+            <div class="text-xs text-slate-400">Пайыздық көрсеткіш</div>
+            <div id="resPercentText" class="text-lg font-bold text-sky-400 mt-1">0%</div>
+          </div>
+          <div class="glass-pill p-3 rounded-xl border border-slate-800">
+            <div class="text-xs text-slate-400">Жұмсалған уақыт</div>
+            <div id="resTimeText" class="text-lg font-bold text-indigo-400 mt-1">00:00</div>
+          </div>
+        </div>
+
+        <!-- Review Answers Breakdown -->
+        <div class="text-left space-y-3">
+          <h4 class="text-sm font-semibold text-slate-300 flex items-center gap-2">
+            <i data-lucide="list-checks" class="w-4 h-4 text-sky-400"></i> Жұмысты талдау:
+          </h4>
+          <div id="answersReview" class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+            <!-- Answers review dynamic list -->
+          </div>
+        </div>
+
+        <button onclick="resetStudentQuiz()" class="px-6 py-3 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center space-x-2 mx-auto transition">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          <span>Қайта тапсырып көру</span>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ================= ADMIN VIEW ================= -->
+    <section id="adminView" class="hidden space-y-6">
+      
+      <!-- Admin Top Stats Ribbon -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
+          <div class="p-3 bg-sky-500/10 rounded-xl text-sky-400">
+            <i data-lucide="users" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="text-xs text-slate-400 font-medium">Жалпы студенттер</div>
+            <div id="adminStatTotal" class="text-2xl font-bold text-white mt-0.5">0</div>
+          </div>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
+          <div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-400">
+            <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="text-xs text-slate-400 font-medium">Тапсырып болғандар</div>
+            <div id="adminStatCompleted" class="text-2xl font-bold text-white mt-0.5">0</div>
+          </div>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
+          <div class="p-3 bg-amber-500/10 rounded-xl text-amber-400">
+            <i data-lucide="loader" class="w-6 h-6 animate-spin-slow"></i>
+          </div>
+          <div>
+            <div class="text-xs text-slate-400 font-medium">Қазір тапсыруда</div>
+            <div id="adminStatActive" class="text-2xl font-bold text-white mt-0.5">0</div>
+          </div>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
+          <div class="p-3 bg-indigo-500/10 rounded-xl text-indigo-400">
+            <i data-lucide="award" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="text-xs text-slate-400 font-medium">Орташа балл</div>
+            <div id="adminStatAvg" class="text-2xl font-bold text-white mt-0.5">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Admin Dashboard Content Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left 2 Cols: Live Students Monitoring Table -->
+        <div class="lg:col-span-2 glass-card rounded-2xl p-6 space-y-4 border border-slate-800">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="font-display font-bold text-lg text-white flex items-center gap-2">
+                <i data-lucide="activity" class="w-5 h-5 text-sky-400"></i> Онлайн Мониторинг
+              </h3>
+              <p class="text-xs text-slate-400">Студенттердің тест тапсыру барысы мен нәтижелері</p>
+            </div>
+
+            <!-- Toolbar Actions -->
+            <div class="flex items-center gap-2">
+              <input type="text" id="adminSearchInput" oninput="renderAdminTable()" placeholder="Іздеу..." 
+                     class="bg-slate-900 border border-slate-700 text-xs text-white rounded-lg px-3 py-2 w-36 focus:outline-none focus:border-sky-500">
+              <button onclick="exportToCSV()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center gap-1 transition" title="CSV Экспорт">
+                <i data-lucide="download" class="w-4 h-4"></i>
+              </button>
+              <button onclick="confirmClearData()" class="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold flex items-center gap-1 border border-red-500/20 transition" title="Мәліметтерді тазалау">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Table Wrapper -->
+          <div class="overflow-x-auto rounded-xl border border-slate-800/80">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-900/90 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                <tr>
+                  <th class="p-3.5">Студент</th>
+                  <th class="p-3.5">Топ</th>
+                  <th class="p-3.5">Мәртебе</th>
+                  <th class="p-3.5">Нәтиже</th>
+                  <th class="p-3.5">Уақыт</th>
+                  <th class="p-3.5 text-right">Әрекет</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableBody" class="divide-y divide-slate-800/60 bg-slate-950/40">
+                <!-- Dynamic student rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right 1 Col: Question Level Analytics -->
+        <div class="glass-card rounded-2xl p-6 space-y-4 border border-slate-800">
+          <div>
+            <h3 class="font-display font-bold text-lg text-white flex items-center gap-2">
+              <i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-400"></i> Сұрақтар аналитикасы
+            </h3>
+            <p class="text-xs text-slate-400">Сұрақтар бойынша дұрыс жауаптар пайызы</p>
+          </div>
+
+          <div id="analyticsContainer" class="space-y-3.5 max-h-[460px] overflow-y-auto pr-1">
+            <!-- Questions analytics progress bars -->
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ADMIN AUTH MODAL -->
+  <div id="adminAuthModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl p-6 max-w-sm w-full space-y-5 border border-slate-800 shadow-2xl">
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center mx-auto">
+          <i data-lucide="lock" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-display font-bold text-xl text-white">Админ Кіру</h3>
+        <p class="text-xs text-slate-400">Панельге өту үшін құпия сөзді енгізіңіз (Әдепкі: admin)</p>
+      </div>
+
+      <div class="space-y-3">
+        <input type="password" id="adminPasswordInput" placeholder="Құпия сөз" 
+               class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
+        <p id="adminAuthError" class="text-xs text-red-400 hidden">Құпия сөз қате!</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="closeAdminAuthModal()" class="w-1/2 py-2.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Болдырмау</button>
+        <button onclick="verifyAdminPassword()" class="w-1/2 py-2.5 rounded-xl text-xs font-semibold bg-sky-500 hover:bg-sky-400 text-white shadow-md shadow-sky-500/20">Кіру</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT DETAIL MODAL (ADMIN) -->
+  <div id="studentDetailModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl p-6 max-w-lg w-full space-y-5 border border-slate-800 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 id="modalStudentName" class="font-display font-bold text-lg text-white">Студент</h3>
+          <p id="modalStudentGroup" class="text-xs text-slate-400"></p>
+        </div>
+        <button onclick="closeStudentModal()" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div id="modalAnswersList" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+        <!-- Student question breakdown -->
+      </div>
+    </div>
+  </div>
+
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot, collection, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Application ID and Firebase Dynamic Config Setup
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'geo-quiz-kz-v1';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' 
+      ? JSON.parse(__firebase_config) 
+      : {
+          // Fallback placeholder structure for local development if needed
+          apiKey: "AIzaSyDemoKeyOnly",
+          authDomain: "demo.firebaseapp.com",
+          projectId: "demo-project",
+          storageBucket: "demo.appspot.com",
+          messagingSenderId: "000000000",
+          appId: "1:000000000:web:000000000"
+        };
+
+    // Firebase Initialization
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentUser = null;
+
+    // Authenticate with fallback
+    async function initAuth() {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          const userCred = await signInWithCustomToken(auth, __initial_auth_token);
+          currentUser = userCred.user;
+        } else {
+          const userCred = await signInAnonymously(auth);
+          currentUser = userCred.user;
+        }
+        console.log("Firebase Authenticated as:", currentUser.uid);
+        setupRealtimeSync();
+      } catch (err) {
+        console.error("Firebase Auth Error:", err);
+      }
+    }
+
+    initAuth();
+
+    // Global App State Data
+    window.QUIZ_QUESTIONS = [
+      {
+        id: 1,
+        question: "Палеозой эрасының қатпарлану (тау жасалу) кезеңі:",
+        options: [
+          { key: "а", text: "байкал" },
+          { key: "ә", text: "каледон" },
+          { key: "б", text: "кембрий" },
+          { key: "в", text: "альпі" },
+          { key: "г", text: "герцин" }
+        ],
+        correct: "г"
+      },
+      {
+        id: 2,
+        question: "Шығыс-Еуропа платформасының фундаменті қалыптасқан кезеңі:",
+        options: [
+          { key: "а", text: "архей" },
+          { key: "ә", text: "протерозой" },
+          { key: "б", text: "палеозой" },
+          { key: "в", text: "кайнозой" },
+          { key: "г", text: "мезозой" }
+        ],
+        correct: "ә"
+      },
+      {
+        id: 3,
+        question: "Лавразия материгі ... қалыптасқаннан кейін пайда болды.",
+        options: [
+          { key: "а", text: "Тұран тақтасы" },
+          { key: "ә", text: "Шығыс-Еуропа платформасы" },
+          { key: "б", text: "Батыс-Сібір тақтасы" },
+          { key: "в", text: "Тянь-Шань" },
+          { key: "г", text: "Орал-Монғол белдеуі" }
+        ],
+        correct: "б"
+      },
+      {
+        id: 4,
+        question: "Қазақстандағы герцин соңындағы платформа:",
+        options: [
+          { key: "а", text: "Шығыс-Еуропа" },
+          { key: "ә", text: "Тұран" },
+          { key: "б", text: "Еуразиялық" },
+          { key: "в", text: "Сібір" },
+          { key: "г", text: "Батыс-Сібір" }
+        ],
+        correct: "б"
+      },
+      {
+        id: 5,
+        question: "Еуразиялық платформаның құрамында:",
+        options: [
+          { key: "а", text: "Сібір тақтасы" },
+          { key: "ә", text: "Батыс-Сібір тақтасы" },
+          { key: "б", text: "Алдан қалқаны" },
+          { key: "в", text: "Қазақ қалқаны" },
+          { key: "г", text: "Тұран тақтасы" }
+        ],
+        correct: "а"
+      },
+      {
+        id: 6,
+        question: "Қазақстания ежелгі құрлығы пайда болған тау жасалу кезеңі:",
+        options: [
+          { key: "а", text: "байкал" },
+          { key: "ә", text: "каледон" },
+          { key: "б", text: "герцин" },
+          { key: "в", text: "мезозой" },
+          { key: "г", text: "альпілік" }
+        ],
+        correct: "ә"
+      },
+      {
+        id: 7,
+        question: "Жаңа тектоникалық қозғалыстар басталған уақыт:",
+        options: [
+          { key: "а", text: "антропогенде 2,5 млн жыл бұрын" },
+          { key: "ә", text: "неогеннің басында 20 млн жыл бұрын" },
+          { key: "б", text: "палеогеннің аяғында 30 млн жыл бұрын" },
+          { key: "в", text: "неогеннің ортасында 10 млн жыл бұрын" },
+          { key: "г", text: "бор дәуірінің соңында 66 млн жыл бұрын" }
+        ],
+        correct: "б"
+      }
+    ];
+
+    // Local Quiz Runtime Variables
+    window.currentStudent = null;
+    window.currentQuestionIdx = 0;
+    window.selectedOption = null;
+    window.studentAnswers = [];
+    window.quizTimerInterval = null;
+    window.questionSecondsLeft = 40;
+    window.totalQuizTimeSeconds = 0;
+    window.totalTimerInterval = null;
+
+    // Realtime Database Store
+    window.studentsDataStore = [];
+
+    // Sound Synth Utility (Web Audio API)
+    window.playSound = function(type) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'correct') {
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+          osc.frequency.exponentialRampToValueAtTime(659.25, ctx.currentTime + 0.15); // E5
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.3);
+        } else if (type === 'wrong') {
+          osc.frequency.setValueAtTime(220, ctx.currentTime); // A3
+          osc.frequency.exponentialRampToValueAtTime(146.83, ctx.currentTime + 0.2); // D3
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.35);
+        } else if (type === 'complete') {
+          osc.frequency.setValueAtTime(440, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.4);
+          gain.gain.setValueAtTime(0.25, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.5);
+        }
+      } catch (e) {
+        // Audio API fallback gracefully
+      }
+    };
+
+    // Firebase Realtime Listener Setup (Public Path)
+    function setupRealtimeSync() {
+      const publicCol = collection(db, 'artifacts', appId, 'public', 'data', 'student_quiz_submissions');
+      
+      onSnapshot(publicCol, (snapshot) => {
+        window.studentsDataStore = [];
+        snapshot.forEach((docSnap) => {
+          window.studentsDataStore.push({ id: docSnap.id, ...docSnap.data() });
+        });
+
+        // Re-render admin dashboard if active
+        if (!document.getElementById('adminView').classList.contains('hidden')) {
+          renderAdminDashboard();
+        }
+      }, (error) => {
+        console.error("Firestore sync error:", error);
+      });
+    }
+
+    // Save or Update Student State in Firestore
+    window.syncStudentToFirestore = async function(status = 'in_progress') {
+      if (!currentUser || !window.currentStudent) return;
+
+      const studentDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_quiz_submissions', currentUser.uid);
+      
+      const payload = {
+        studentId: currentUser.uid,
+        name: window.currentStudent.name,
+        group: window.currentStudent.group,
+        status: status, // 'in_progress' | 'completed'
+        currentQuestionIndex: window.currentQuestionIdx,
+        score: window.studentAnswers.filter(a => a.isCorrect).length,
+        totalQuestions: window.QUIZ_QUESTIONS.length,
+        answers: window.studentAnswers,
+        timeSpentSeconds: window.totalQuizTimeSeconds,
+        updatedAt: new Date().toISOString()
+      };
+
+      try {
+        await setDoc(studentDocRef, payload, { merge: true });
+      } catch (err) {
+        console.error("Error saving student state:", err);
+      }
+    };
+
+    // Start Quiz Execution
+    window.handleStartQuiz = function(event) {
+      event.preventDefault();
+      const name = document.getElementById('studentName').value.trim();
+      const group = document.getElementById('studentGroup').value.trim();
+
+      if (!name || !group) return;
+
+      window.currentStudent = { name, group };
+      window.currentQuestionIdx = 0;
+      window.studentAnswers = [];
+      window.totalQuizTimeSeconds = 0;
+
+      document.getElementById('stepRegistration').classList.add('hidden');
+      document.getElementById('stepQuiz').classList.remove('hidden');
+      document.getElementById('quizStudentTag').innerText = `${name} (${group})`;
+
+      // Start global timer
+      clearInterval(window.totalTimerInterval);
+      window.totalTimerInterval = setInterval(() => {
+        window.totalQuizTimeSeconds++;
+      }, 1000);
+
+      window.syncStudentToFirestore('in_progress');
+      loadQuestion();
+    };
+
+    // Load Question into UI
+    function loadQuestion() {
+      const q = window.QUIZ_QUESTIONS[window.currentQuestionIdx];
+      document.getElementById('qIndex').innerText = window.currentQuestionIdx + 1;
+      document.getElementById('qTotal').innerText = window.QUIZ_QUESTIONS.length;
+      document.getElementById('questionTitle').innerText = `${q.id}. ${q.question}`;
+
+      // Progress bar percentage
+      const progressPct = ((window.currentQuestionIdx) / window.QUIZ_QUESTIONS.length) * 100;
+      document.getElementById('quizProgressBar').style.width = `${progressPct}%`;
+
+      // Render Options
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+      window.selectedOption = null;
+
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.onclick = () => selectOption(opt.key, btn);
+        btn.className = `option-btn w-full text-left p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800/80 hover:border-sky-500/50 flex items-center justify-between transition-all duration-200 group`;
+        btn.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <span class="w-7 h-7 rounded-lg bg-slate-800 group-hover:bg-sky-500/20 group-hover:text-sky-400 text-slate-400 font-bold text-xs flex items-center justify-center transition">
+              ${opt.key.toUpperCase()}
+            </span>
+            <span class="text-sm font-medium text-slate-200">${opt.text}</span>
+          </div>
+          <div class="w-5 h-5 rounded-full border border-slate-700 group-hover:border-sky-500 flex items-center justify-center">
+            <div class="w-2.5 h-2.5 rounded-full bg-sky-400 opacity-0 transition group-hover:opacity-100"></div>
+          </div>
+        `;
+        container.appendChild(btn);
+      });
+
+      // Reset Next Button
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.disabled = true;
+      nextBtn.className = "px-6 py-2.5 rounded-xl font-bold text-sm bg-slate-800 text-slate-500 cursor-not-allowed flex items-center space-x-2 transition duration-200";
+
+      // Reset Per-Question Timer (40 sec)
+      clearInterval(window.quizTimerInterval);
+      window.questionSecondsLeft = 40;
+      updateTimerDisplay();
+      window.quizTimerInterval = setInterval(() => {
+        window.questionSecondsLeft--;
+        updateTimerDisplay();
+        if (window.questionSecondsLeft <= 0) {
+          clearInterval(window.quizTimerInterval);
+          // Auto submit timeout
+          if (!window.selectedOption) window.selectedOption = 'none';
+          window.submitAnswer();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      document.getElementById('timerText').innerText = `${window.questionSecondsLeft}с`;
+      const timerBox = document.getElementById('quizTimer');
+      if (window.questionSecondsLeft <= 10) {
+        timerBox.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/20 border border-red-500/40 text-red-400 text-sm font-bold min-w-[70px] justify-center animate-pulse";
+      } else {
+        timerBox.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold min-w-[70px] justify-center";
+      }
+    }
+
+    function selectOption(key, element) {
+      window.selectedOption = key;
+      document.querySelectorAll('.option-btn').forEach(b => {
+        b.classList.remove('border-sky-500', 'bg-sky-500/10', 'ring-1', 'ring-sky-500');
+      });
+      element.classList.add('border-sky-500', 'bg-sky-500/10', 'ring-1', 'ring-sky-500');
+
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.disabled = false;
+      nextBtn.className = "px-6 py-2.5 rounded-xl font-bold text-sm bg-sky-500 hover:bg-sky-400 text-white shadow-lg shadow-sky-500/25 flex items-center space-x-2 transition duration-200";
+    }
+
+    window.submitAnswer = function() {
+      clearInterval(window.quizTimerInterval);
+
+      const q = window.QUIZ_QUESTIONS[window.currentQuestionIdx];
+      const isCorrect = (window.selectedOption === q.correct);
+
+      if (isCorrect) {
+        window.playSound('correct');
+      } else {
+        window.playSound('wrong');
+      }
+
+      window.studentAnswers.push({
+        questionId: q.id,
+        selected: window.selectedOption || 'Уақыт бітті',
+        correct: q.correct,
+        isCorrect: isCorrect
+      });
+
+      window.currentQuestionIdx++;
+
+      if (window.currentQuestionIdx < window.QUIZ_QUESTIONS.length) {
+        window.syncStudentToFirestore('in_progress');
+        loadQuestion();
+      } else {
+        // Quiz Complete
+        finishQuiz();
+      }
+    };
+
+    function finishQuiz() {
+      clearInterval(window.totalTimerInterval);
+      window.syncStudentToFirestore('completed');
+
+      document.getElementById('stepQuiz').classList.add('hidden');
+      document.getElementById('stepResult').classList.remove('hidden');
+
+      const score = window.studentAnswers.filter(a => a.isCorrect).length;
+      const total = window.QUIZ_QUESTIONS.length;
+      const pct = Math.round((score / total) * 100);
+
+      document.getElementById('resScoreText').innerText = `${score} / ${total}`;
+      document.getElementById('resPercentText').innerText = `${pct}%`;
+
+      // Format time
+      const mins = Math.floor(window.totalQuizTimeSeconds / 60);
+      const secs = window.totalQuizTimeSeconds % 60;
+      document.getElementById('resTimeText').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+      document.getElementById('scoreBadge').innerText = `${pct}%`;
+      
+      const greeting = document.getElementById('resultGreeting');
+      if (pct >= 80) {
+        greeting.innerText = `Өте тамаша, ${window.currentStudent.name}! Геология бойынша сіздің біліміңіз өте жоғары! 🎉`;
+        window.playSound('complete');
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      } else if (pct >= 50) {
+        greeting.innerText = `Жақсы нәтиже, ${window.currentStudent.name}! Әлі де ізденуге болады.`;
+      } else {
+        greeting.innerText = `Нәтижеңіз төмендеу, ${window.currentStudent.name}. Тақырыпты қайта қарап шығуға кеңес береміз.`;
+      }
+
+      // Render answers review
+      const reviewContainer = document.getElementById('answersReview');
+      reviewContainer.innerHTML = '';
+
+      window.QUIZ_QUESTIONS.forEach((q, idx) => {
+        const studentAns = window.studentAnswers[idx];
+        const item = document.createElement('div');
+        item.className = `p-3 rounded-xl text-xs flex items-start justify-between gap-3 border ${studentAns.isCorrect ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : 'bg-red-500/10 border-red-500/20 text-red-300'}`;
+        
+        item.innerHTML = `
+          <div class="space-y-1">
+            <div class="font-semibold text-slate-200">${q.id}. ${q.question}</div>
+            <div class="text-[11px] text-slate-400">
+              Сіздің жауабыңыз: <span class="font-bold uppercase">${studentAns.selected}</span> | 
+              Дұрыс жауап: <span class="font-bold uppercase text-emerald-400">${q.correct}</span>
+            </div>
+          </div>
+          <i data-lucide="${studentAns.isCorrect ? 'check-circle' : 'x-circle'}" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+        `;
+        reviewContainer.appendChild(item);
+      });
+      lucide.createIcons();
+    }
+
+    window.resetStudentQuiz = function() {
+      document.getElementById('stepResult').classList.add('hidden');
+      document.getElementById('stepRegistration').classList.remove('hidden');
+    };
+
+    window.switchTab = function(tab) {
+      const studentView = document.getElementById('studentView');
+      const adminView = document.getElementById('adminView');
+      const navStudentBtn = document.getElementById('navStudentBtn');
+      const navAdminBtn = document.getElementById('navAdminBtn');
+
+      if (tab === 'student') {
+        studentView.classList.remove('hidden');
+        adminView.classList.add('hidden');
+        navStudentBtn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-sky-500 text-white shadow-md shadow-sky-500/25";
+        navAdminBtn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all duration-200";
+      } else {
+        studentView.classList.add('hidden');
+        adminView.classList.remove('hidden');
+        navAdminBtn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-sky-500 text-white shadow-md shadow-sky-500/25";
+        navStudentBtn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all duration-200";
+        renderAdminDashboard();
+      }
+    };
+
+    window.openAdminAuthModal = function() {
+      document.getElementById('adminAuthModal').classList.remove('hidden');
+      document.getElementById('adminPasswordInput').value = '';
+      document.getElementById('adminAuthError').classList.add('hidden');
+    };
+
+    window.closeAdminAuthModal = function() {
+      document.getElementById('adminAuthModal').classList.add('hidden');
+    };
+
+    window.verifyAdminPassword = function() {
+      const pass = document.getElementById('adminPasswordInput').value;
+      if (pass === 'admin' || pass === '1234') {
+        closeAdminAuthModal();
+        switchTab('admin');
+      } else {
+        document.getElementById('adminAuthError').classList.remove('hidden');
+      }
+    };
+
+    function renderAdminDashboard() {
+      const data = window.studentsDataStore;
+
+      // Stats
+      const total = data.length;
+      const completed = data.filter(d => d.status === 'completed').length;
+      const active = data.filter(d => d.status === 'in_progress').length;
+      
+      let avgScorePct = 0;
+      if (completed > 0) {
+        const sumPct = data.filter(d => d.status === 'completed').reduce((acc, curr) => acc + (curr.score / curr.totalQuestions), 0);
+        avgScorePct = Math.round((sumPct / completed) * 100);
+      }
+
+      document.getElementById('adminStatTotal').innerText = total;
+      document.getElementById('adminStatCompleted').innerText = completed;
+      document.getElementById('adminStatActive').innerText = active;
+      document.getElementById('adminStatAvg').innerText = `${avgScorePct}%`;
+
+      renderAdminTable();
+      renderQuestionAnalytics();
+    }
+
+    window.renderAdminTable = function() {
+      const tbody = document.getElementById('adminTableBody');
+      const search = document.getElementById('adminSearchInput').value.toLowerCase();
+      tbody.innerHTML = '';
+
+      const filtered = window.studentsDataStore.filter(s => 
+        (s.name && s.name.toLowerCase().includes(search)) || 
+        (s.group && s.group.toLowerCase().includes(search))
+      );
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center p-6 text-slate-500">Әзірше ешқандай мәлімет жоқ</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-900/60 transition";
+
+        const pct = Math.round((s.score / s.totalQuestions) * 100) || 0;
+        const mins = Math.floor((s.timeSpentSeconds || 0) / 60);
+        const secs = (s.timeSpentSeconds || 0) % 60;
+        const timeFormatted = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+        tr.innerHTML = `
+          <td class="p-3.5 font-semibold text-slate-200">${s.name || 'Белгісіз'}</td>
+          <td class="p-3.5 text-slate-400">${s.group || '-'}</td>
+          <td class="p-3.5">
+            ${s.status === 'completed' 
+              ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-lucide="check" class="w-3 h-3"></i> Аяқталды</span>`
+              : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse"><i data-lucide="clock" class="w-3 h-3"></i> Өтуде</span>`}
+          </td>
+          <td class="p-3.5 font-bold ${pct >= 70 ? 'text-emerald-400' : 'text-sky-400'}">${s.score || 0} / ${s.totalQuestions || 7} (${pct}%)</td>
+          <td class="p-3.5 text-slate-400 font-mono">${timeFormatted}</td>
+          <td class="p-3.5 text-right">
+            <button onclick="viewStudentDetails('${s.id}')" class="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/20 font-medium text-[11px] transition">
+              Толығырақ
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    };
+
+    function renderQuestionAnalytics() {
+      const container = document.getElementById('analyticsContainer');
+      container.innerHTML = '';
+
+      const completedStudents = window.studentsDataStore.filter(s => s.answers && s.answers.length > 0);
+
+      window.QUIZ_QUESTIONS.forEach(q => {
+        let correctCount = 0;
+        let totalAnswered = 0;
+
+        completedStudents.forEach(s => {
+          const ans = s.answers.find(a => a.questionId === q.id);
+          if (ans) {
+            totalAnswered++;
+            if (ans.isCorrect) correctCount++;
+          }
+        });
+
+        const pct = totalAnswered > 0 ? Math.round((correctCount / totalAnswered) * 100) : 0;
+
+        const box = document.createElement('div');
+        box.className = "space-y-1.5 p-3 rounded-xl bg-slate-900/60 border border-slate-800/80";
+        box.innerHTML = `
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-slate-300 truncate max-w-[200px]" title="${q.question}">${q.id}. ${q.question}</span>
+            <span class="font-bold ${pct < 50 ? 'text-red-400' : 'text-emerald-400'}">${pct}%</span>
+          </div>
+          <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+            <div class="h-full ${pct < 50 ? 'bg-red-500' : 'bg-emerald-500'} transition-all duration-300" style="width: ${pct}%"></div>
+          </div>
+          <div class="text-[10px] text-slate-500 text-right">${correctCount} / ${totalAnswered} студент дұрыс жауап берді</div>
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    window.viewStudentDetails = function(studentId) {
+      const student = window.studentsDataStore.find(s => s.id === studentId);
+      if (!student) return;
+
+      document.getElementById('modalStudentName').innerText = student.name || 'Студент';
+      document.getElementById('modalStudentGroup').innerText = `Топ: ${student.group || '-'} | Бағасы: ${student.score || 0}/${student.totalQuestions || 7}`;
+
+      const list = document.getElementById('modalAnswersList');
+      list.innerHTML = '';
+
+      if (!student.answers || student.answers.length === 0) {
+        list.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Жауаптар әлі енгізілмеді.</p>`;
+      } else {
+        window.QUIZ_QUESTIONS.forEach((q, idx) => {
+          const ans = student.answers[idx] || { selected: '-', isCorrect: false };
+          const div = document.createElement('div');
+          div.className = `p-3 rounded-xl text-xs border ${ans.isCorrect ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : 'bg-red-500/10 border-red-500/20 text-red-300'}`;
+          div.innerHTML = `
+            <div class="font-medium text-slate-200 mb-1">${q.id}. ${q.question}</div>
+            <div class="flex justify-between text-[11px]">
+              <span>Тандағаны: <strong class="uppercase">${ans.selected}</strong></span>
+              <span>Дұрысы: <strong class="uppercase text-emerald-400">${q.correct}</strong></span>
+            </div>
+          `;
+          list.appendChild(div);
+        });
+      }
+
+      document.getElementById('studentDetailModal').classList.remove('hidden');
+    };
+
+    window.closeStudentModal = function() {
+      document.getElementById('studentDetailModal').classList.add('hidden');
+    };
+
+    window.exportToCSV = function() {
+      if (window.studentsDataStore.length === 0) {
+        alert("Экспорттау үшін мәлімет жоқ!");
+        return;
+      }
+
+      let csv = "\uFEFFСтудент,Топ,Мәртебе,Ұпай,Жалпы,Пайыз,Уақыты(сек)\n";
+      window.studentsDataStore.forEach(s => {
+        const pct = Math.round((s.score / s.totalQuestions) * 100) || 0;
+        csv += `"${s.name || ''}","${s.group || ''}","${s.status || ''}",${s.score || 0},${s.totalQuestions || 7},${pct}%,${s.timeSpentSeconds || 0}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `GeoQuiz_Results_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    window.confirmClearData = async function() {
+      if (!confirm("Барлық студенттердің нәтижелерін өшіруге сенімдісіз бе?")) return;
+
+      try {
+        const snapshot = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'student_quiz_submissions'));
+        const deletePromises = snapshot.docs.map(d => deleteDoc(d.ref));
+        await Promise.all(deletePromises);
+        alert("Барлық мәліметтер тазартылды.");
+      } catch (e) {
+        console.error("Delete error:", e);
+        alert("Қате орын алды.");
+      }
+    };
+
+    // Initialize Lucide Icons
+    window.addEventListener('load', () => {
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
